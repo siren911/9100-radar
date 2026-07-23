@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>9100 PRO Global Signal Radar — SEED</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F4F6F9; --surface:#FFFFFF; --surface2:#FAFBFD;
+  --ink:#17232E; --ink2:#48586A; --ink3:#7C8A99;
+  --line:#DDE4EC; --line2:#EAEFF5;
+  --blue:#2456A6; --blue-bg:#EBF1FB;
+  --amber:#B96A00; --amber-bg:#FBF2E2;
+  --red:#BB3A3F; --red-bg:#FAECEC; --red-line:#EBC2C4;
+  --green:#1E7A4D; --green-bg:#E8F4EE;
+  --purple:#6247AA; --purple-bg:#F0ECFA;
+  --mono:'IBM Plex Mono',ui-monospace,monospace;
+  --sans:'IBM Plex Sans KR','Apple SD Gothic Neo','Noto Sans KR',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{font-family:var(--sans);background:var(--bg);color:var(--ink);font-size:14px;line-height:1.55}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;font-size:inherit}
+input,select{font-family:inherit;font-size:13px}
+a{color:var(--blue)}
+.mono{font-family:var(--mono)}
+
+header{background:var(--surface);border-bottom:1px solid var(--line)}
+.hd-top{display:flex;align-items:center;gap:14px;padding:14px 20px;flex-wrap:wrap}
+.hd-mark{width:34px;height:34px;border-radius:8px;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-weight:600;font-size:12px;letter-spacing:-.5px;flex:none}
+.hd-title h1{font-size:17px;font-weight:700;letter-spacing:-.2px;line-height:1.2}
+.hd-title p{font-size:11.5px;color:var(--ink3);margin-top:1px}
+.hd-spacer{flex:1}
+.seed-badge{background:var(--amber-bg);color:var(--amber);border:1px solid #ECD5AC;font-family:var(--mono);font-weight:600;font-size:11px;padding:5px 10px;border-radius:6px;letter-spacing:.4px;display:flex;align-items:center;gap:6px}
+.seed-badge::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--amber);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+@media (prefers-reduced-motion:reduce){.seed-badge::before{animation:none}}
+.view-tabs{display:flex;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:3px;gap:2px}
+.view-tabs button{padding:6px 14px;border-radius:6px;font-size:13px;font-weight:500;color:var(--ink2)}
+.view-tabs button.on{background:var(--surface);color:var(--ink);font-weight:600;box-shadow:0 1px 2px rgba(23,35,46,.08)}
+
+.rail{background:var(--ink);color:#C7D3DE;font-family:var(--mono);font-size:11px;padding:7px 20px;display:flex;gap:22px;align-items:center;overflow-x:auto;white-space:nowrap}
+.rail b{color:#fff;font-weight:600}
+.rail .lamp{display:inline-flex;align-items:center;gap:5px}
+.rail .dot{width:6px;height:6px;border-radius:50%}
+.dot.man{background:#4CAF80}.dot.off{background:#5A6B7B}.dot.blk{background:#D08A3E}
+
+main{max-width:1240px;margin:0 auto;padding:20px}
+.notice{background:var(--blue-bg);border:1px solid #C9D9F1;border-radius:8px;padding:10px 14px;font-size:12.5px;color:#2A4A7E;margin-bottom:12px}
+
+.p0{background:var(--red-bg);border:1px solid var(--red-line);border-left:4px solid var(--red);border-radius:8px;padding:13px 15px;margin-bottom:18px;display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.p0 .tag{font-family:var(--mono);font-size:10px;font-weight:600;background:var(--red);color:#fff;padding:3px 8px;border-radius:5px;letter-spacing:.5px;flex:none}
+.p0 .txt{flex:1;min-width:240px}
+.p0 .txt b{color:var(--red)}
+.p0 .txt p{font-size:12px;color:var(--ink2);margin-top:2px}
+.p0 button{background:var(--red);color:#fff;border-radius:7px;padding:7px 13px;font-size:12.5px;font-weight:600;flex:none}
+
+section h2{font-size:13px;font-weight:700;color:var(--ink2);text-transform:uppercase;letter-spacing:.6px;margin:22px 0 10px;display:flex;align-items:baseline;gap:8px}
+section h2 .sub{font-size:11px;font-weight:400;color:var(--ink3);text-transform:none;letter-spacing:0}
+
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:13px 15px}
+.kpi .lb{font-size:11.5px;color:var(--ink3);font-weight:500}
+.kpi .v{font-family:var(--mono);font-size:26px;font-weight:600;letter-spacing:-.5px;margin-top:2px}
+.kpi .d{font-size:11px;color:var(--ink3);margin-top:2px}
+.kpi.warn .v{color:var(--amber)} .kpi.crit .v{color:var(--red)}
+
+.clusters{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px}
+.cl{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px;cursor:pointer;transition:border-color .12s,box-shadow .12s}
+.cl:hover{border-color:var(--blue);box-shadow:0 2px 8px rgba(36,86,166,.08)}
+.cl.fw{border-color:var(--red-line);background:linear-gradient(#FFF,#FDF7F7);box-shadow:0 0 0 1px var(--red-line)}
+.cl.fw:hover{border-color:var(--red)}
+.cl .top{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.cl h3{font-size:14px;font-weight:600;line-height:1.35}
+.cl .code{font-family:var(--mono);font-size:10.5px;color:var(--ink3);margin-top:3px}
+.cl .meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}
+.cl .bars{display:flex;align-items:flex-end;gap:2px;height:30px;margin-top:11px}
+.cl .bars i{flex:1;background:#C9D6E8;border-radius:2px 2px 0 0;min-height:2px}
+.cl .bars i.hot{background:var(--blue)}
+.cl.fw .bars i.hot{background:var(--red)}
+.cl .stat{font-family:var(--mono);font-size:10.5px;color:var(--ink3);margin-top:5px;display:flex;justify-content:space-between}
+
+.chip{display:inline-block;font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:99px;border:1px solid transparent;line-height:1.6;white-space:nowrap}
+.c-sev1{background:var(--green-bg);color:var(--green)} .c-sev2{background:#EDF2F7;color:var(--ink2)}
+.c-sev3{background:var(--amber-bg);color:var(--amber)} .c-sev4{background:var(--red-bg);color:var(--red)}
+.c-ev{background:var(--surface2);color:var(--ink2);border-color:var(--line)}
+.c-plat{background:var(--purple-bg);color:var(--purple)}
+.c-fw{background:var(--red);color:#fff;font-family:var(--mono);font-size:9.5px;letter-spacing:.3px}
+.c-unv{background:#FFF;color:var(--red);border-color:var(--red-line);font-family:var(--mono);font-size:9.5px;letter-spacing:.3px}
+.c-real{background:var(--green-bg);color:var(--green);font-family:var(--mono);font-size:9.5px}
+
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:820px){.two{grid-template-columns:1fr}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px}
+.rrow{display:flex;align-items:center;gap:10px;padding:5px 0;font-size:12.5px}
+.rrow .nm{width:150px;color:var(--ink2);flex:none}
+.rrow .bar{flex:1;height:8px;background:var(--line2);border-radius:4px;overflow:hidden}
+.rrow .bar i{display:block;height:100%;background:var(--blue);border-radius:4px}
+.rrow .n{font-family:var(--mono);font-size:11px;width:30px;text-align:right;color:var(--ink2)}
+.srow{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--line2);font-size:12.5px}
+.srow:last-child{border-bottom:0}
+.srow .st{font-family:var(--mono);font-size:10px;font-weight:600;padding:2px 7px;border-radius:5px}
+.st.man{background:var(--green-bg);color:var(--green)} .st.blocked{background:#EDF2F7;color:var(--ink3)} .st.nc{background:var(--surface2);color:var(--ink3);border:1px solid var(--line)}
+
+.filters{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;position:sticky;top:0;z-index:5;box-shadow:0 2px 6px rgba(23,35,46,.04)}
+.filters select,.filters input[type=search]{border:1px solid var(--line);border-radius:7px;padding:7px 9px;background:var(--surface2);color:var(--ink)}
+.filters input[type=search]{flex:1;min-width:140px}
+.fcount{font-family:var(--mono);font-size:11px;color:var(--ink3);margin-left:auto}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:7px;padding:7px 12px;font-size:12.5px;font-weight:500;color:var(--ink2)}
+.btn:hover{border-color:var(--blue);color:var(--blue)}
+.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn.fwtoggle.on{background:var(--red);border-color:var(--red);color:#fff}
+
+table{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-top:12px;font-size:12.5px}
+thead th{background:var(--surface2);color:var(--ink2);font-size:11px;font-weight:600;text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);cursor:pointer;user-select:none;white-space:nowrap}
+thead th:hover{color:var(--blue)}
+tbody td{padding:9px 10px;border-bottom:1px solid var(--line2);vertical-align:top}
+tbody tr{cursor:pointer}
+tbody tr:hover{background:var(--blue-bg)}
+tbody tr.fwhl{background:#FDF5F5;box-shadow:inset 3px 0 0 var(--red)}
+tbody tr.fwhl:hover{background:#FBECEC}
+tbody tr:last-child td{border-bottom:0}
+.tid{font-family:var(--mono);font-size:11px;color:var(--ink3)}
+.ttl{font-weight:500;max-width:340px}
+.tsub{font-size:11px;color:var(--ink3);margin-top:2px}
+.tbl-wrap{overflow-x:auto;border-radius:10px}
+.lnk{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:7px;border:1px solid var(--line);background:var(--surface2);color:var(--blue);font-size:13px;text-decoration:none;font-weight:600}
+.lnk:hover{border-color:var(--blue);background:var(--blue-bg)}
+
+.cards{display:none;margin-top:12px;gap:8px;flex-direction:column}
+.ccase{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px;cursor:pointer}
+.ccase.fwhl{border-color:var(--red-line);box-shadow:inset 3px 0 0 var(--red);background:#FDF8F8}
+.ccase .r1{display:flex;justify-content:space-between;gap:8px;font-family:var(--mono);font-size:10.5px;color:var(--ink3);align-items:center}
+.ccase h4{font-size:13.5px;font-weight:600;margin:5px 0 3px;line-height:1.4}
+.ccase .r2{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px}
+@media(max-width:760px){.tbl-wrap{display:none}.cards{display:flex}}
+
+.ovl{position:fixed;inset:0;background:rgba(15,25,35,.42);z-index:20;opacity:0;pointer-events:none;transition:opacity .18s}
+.ovl.open{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(540px,100%);background:var(--surface);z-index:21;transform:translateX(102%);transition:transform .22s ease;overflow-y:auto;box-shadow:-8px 0 30px rgba(15,25,35,.18)}
+.drawer.open{transform:none}
+.dw-hd{position:sticky;top:0;background:var(--surface);border-bottom:1px solid var(--line);padding:14px 18px;display:flex;gap:10px;align-items:flex-start;z-index:2}
+.dw-hd h3{font-size:15px;font-weight:600;line-height:1.4;flex:1}
+.dw-x{font-size:20px;color:var(--ink3);padding:0 4px;line-height:1}
+.dw-x:hover{color:var(--ink)}
+.dw-bd{padding:16px 18px 40px}
+.dw-sec{margin-bottom:18px}
+.dw-sec h5{font-size:11px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px}
+.openbtn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:var(--blue);color:#fff;border-radius:9px;padding:11px;font-size:13.5px;font-weight:600;text-decoration:none;margin-bottom:6px}
+.openbtn:hover{background:#1C468A}
+.openbtn.fwred{background:var(--red)}
+.openbtn.fwred:hover{background:#9E2F34}
+.quote{background:#FFFDF4;border:1px solid #EAE0B8;border-left:3px solid #D9B23E;border-radius:0 8px 8px 0;padding:10px 13px;margin-bottom:8px}
+.quote .qt{font-family:var(--mono);font-size:12.5px;color:#5C4E1B;line-height:1.6}
+.quote .qm{font-size:10.5px;color:var(--ink3);margin-top:5px}
+.kv{display:grid;grid-template-columns:96px 1fr;gap:4px 10px;font-size:12.5px}
+.kv .k{color:var(--ink3)} .kv .v{color:var(--ink)}
+.claim{border:1px solid var(--line);border-left:3px solid var(--blue);border-radius:0 8px 8px 0;padding:10px 12px;margin-bottom:8px;background:var(--surface2)}
+.claim.crit{border-left-color:var(--red)}
+.claim .ct{font-size:11px;font-weight:600;color:var(--ink2)}
+.claim p{font-size:12.5px;margin-top:5px;color:var(--ink)}
+.hyp{font-size:12.5px;padding:6px 0;border-bottom:1px dashed var(--line2);display:flex;gap:8px}
+.hyp:last-child{border-bottom:0}
+.hyp .p{font-family:var(--mono);font-size:11px;color:var(--ink3);flex:none;width:70px}
+.warnbox{background:var(--amber-bg);border:1px solid #ECD5AC;border-radius:8px;padding:9px 12px;font-size:12px;color:#7A5200}
+.src{font-family:var(--mono);font-size:11px;word-break:break-all;color:var(--blue);background:var(--blue-bg);border-radius:6px;padding:8px 10px;display:block;margin-top:6px;text-decoration:none}
+.src:hover{background:#DFE9F8}
+
+footer{max-width:1240px;margin:10px auto 0;padding:16px 20px 30px;font-size:11px;color:var(--ink3);border-top:1px solid var(--line)}
+.hide{display:none!important}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hd-top">
+    <div class="hd-mark">9100</div>
+    <div class="hd-title">
+      <h1>9100 PRO Global Signal Radar</h1>
+      <p>공개 웹 기반 품질 신호 리서치 도구 · 비공식 · Samsung 공식 서비스 아님</p>
+    </div>
+    <div class="hd-spacer"></div>
+    <div class="view-tabs" role="tablist">
+      <button id="tabExec" class="on" onclick="setView('exec')">경영진 Overview</button>
+      <button id="tabWb" onclick="setView('wb')">분석가 Workbench</button>
+    </div>
+    <div class="seed-badge" title="공개 게시글을 수동 검증한 스냅샷입니다">SEED · 수동검증 07-23</div>
+  </div>
+  <div class="rail" aria-label="시스템 상태">
+    <span><b>PROTOTYPE MODE</b> · 자동 수집 커넥터 미연결</span>
+    <span>마지막 수동 검증: <b>2026-07-23</b></span>
+    <span>데이터: <b>실제 공개 게시글 기반 스냅샷</b> (라이브 아님)</span>
+    <span class="lamp"><i class="dot man"></i>Samsung Community (수동)</span>
+    <span class="lamp"><i class="dot man"></i>Intel · ROG Forum (수동)</span>
+    <span class="lamp"><i class="dot man"></i>매체 리뷰 (수동)</span>
+    <span class="lamp"><i class="dot off"></i>Reddit API</span>
+    <span class="lamp"><i class="dot blk"></i>Retail / X: POLICY_BLOCKED</span>
+  </div>
+</header>
+
+<main>
+  <div class="notice">모든 사례는 <b>2026-07-23 수동 검증한 실제 공개 게시글</b>에 기반한 스냅샷입니다. 각 사례의 <b>↗ 버튼 또는 상세 화면의 "원문 페이지 열기"</b>를 누르면 실제 웹사이트에서 작성자의 전체 워딩을 확인할 수 있습니다. 앱에는 짧은 발췌만 저장합니다(수집 원칙·저작권). 모든 항목은 사용자 제보이며 확인된 제품 결함이 아닙니다.</div>
+
+  <div class="p0">
+    <span class="tag">P0 후보</span>
+    <div class="txt">
+      <b>펌웨어 1B2QNXH7 업데이트 후 드라이브 소실·Gen5 포트 미인식 제보 급증</b>
+      <p>최근 48시간 내 독립 사례 5건 이상 (2TB·4TB·8TB, ASUS·HP·Lenovo 등 복수 플랫폼). 롤백 펌웨어 부재 보고. 미검증 — 사람 검토 및 공식 확인 대기.</p>
+    </div>
+    <button onclick="gotoFW()">관련 사례 보기 →</button>
+  </div>
+
+  <div id="viewExec">
+    <section>
+      <h2>핵심 지표 <span class="sub">수동 검증 스냅샷 · 2026-07-23</span></h2>
+      <div class="kpis">
+        <div class="kpi"><div class="lb">검증된 스레드</div><div class="v">10</div><div class="d">전건 원문 URL 연결</div></div>
+        <div class="kpi"><div class="lb">고유 사례</div><div class="v">16</div><div class="d">동일 스레드 내 중복 제외</div></div>
+        <div class="kpi crit"><div class="lb">신규 사례 48h</div><div class="v">5</div><div class="d">전건 FW 1B2QNXH7 연관</div></div>
+        <div class="kpi crit"><div class="lb">P0 후보 클러스터</div><div class="v">1</div><div class="d">사람 검토 대기</div></div>
+        <div class="kpi"><div class="lb">플랫폼 원인 가능성 비중</div><div class="v">44%</div><div class="d">보드 BIOS·슬롯·CPU 요인</div></div>
+        <div class="kpi"><div class="lb">공식·모더레이터 답변</div><div class="v">4</div><div class="d">ASUS 조사 진행 포함</div></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>이슈 클러스터 <span class="sub">카드를 누르면 분석가 화면에서 해당 사례로 이동</span></h2>
+      <div class="clusters" id="clusterGrid"></div>
+    </section>
+
+    <section class="two">
+      <div class="panel">
+        <h2 style="margin-top:0">지역별 고유 사례 <span class="sub">커뮤니티·본문 기준 추정</span></h2>
+        <div id="regionRows"></div>
+        <p style="font-size:11px;color:var(--ink3);margin-top:8px">판매량 분모가 없으므로 불량률이 아닌 <b>제보 건수</b>입니다. 영어권 커뮤니티 편향이 포함되어 있습니다.</p>
+      </div>
+      <div class="panel">
+        <h2 style="margin-top:0">수집 커버리지</h2>
+        <div class="srow"><span>Samsung Community (US·EU)</span><span class="st man">MANUAL_VERIFIED</span></div>
+        <div class="srow"><span>Intel Community</span><span class="st man">MANUAL_VERIFIED</span></div>
+        <div class="srow"><span>ASUS ROG Forum</span><span class="st man">MANUAL_VERIFIED</span></div>
+        <div class="srow"><span>매체 리뷰 (PCMag 등)</span><span class="st man">MANUAL_VERIFIED</span></div>
+        <div class="srow"><span>Reddit 공식 API</span><span class="st nc">NOT_CONNECTED</span></div>
+        <div class="srow"><span>QuasarZone · 5ch · Chiphell</span><span class="st nc">NOT_CONNECTED</span></div>
+        <div class="srow"><span>Amazon · JD · Tmall · X</span><span class="st blocked">POLICY_BLOCKED</span></div>
+      </div>
+    </section>
+  </div>
+
+  <div id="viewWb" class="hide">
+    <section>
+      <h2>사례 탐색 <span class="sub">행 클릭 = 상세 · ↗ 클릭 = 원문 웹페이지 바로 이동</span></h2>
+      <div class="filters">
+        <input type="search" id="fq" placeholder="검색: 증상, 보드, 펌웨어…" oninput="render()">
+        <button class="btn fwtoggle" id="fwBtn" onclick="toggleFW()">FW 1B2QNXH7 연관만</button>
+        <select id="fcat" onchange="render()"><option value="">카테고리 전체</option></select>
+        <select id="fsev" onchange="render()"><option value="">Severity 전체</option><option>4</option><option>3</option><option>2</option><option>1</option></select>
+        <select id="freg" onchange="render()"><option value="">지역 전체</option></select>
+        <select id="fcap" onchange="render()"><option value="">용량 전체</option></select>
+        <button class="btn" onclick="resetFilters()">초기화</button>
+        <button class="btn primary" onclick="exportCSV()">CSV 내보내기</button>
+        <span class="fcount" id="fcount"></span>
+      </div>
+
+      <div class="tbl-wrap"><table>
+        <thead><tr>
+          <th onclick="setSort('id')">ID</th>
+          <th onclick="setSort('title')">사례</th>
+          <th onclick="setSort('cat')">분류</th>
+          <th onclick="setSort('sev')">Sev</th>
+          <th onclick="setSort('evidence')">증거 수준</th>
+          <th onclick="setSort('region')">지역</th>
+          <th onclick="setSort('cap')">용량</th>
+          <th onclick="setSort('fw')">펌웨어</th>
+          <th onclick="setSort('date')">최근</th>
+          <th>원문</th>
+        </tr></thead>
+        <tbody id="tbody"></tbody>
+      </table></div>
+      <div class="cards" id="cardList"></div>
+    </section>
+  </div>
+</main>
+
+<div class="ovl" id="ovl" onclick="closeDrawer()"></div>
+<aside class="drawer" id="drawer" aria-label="사례 상세">
+  <div class="dw-hd">
+    <h3 id="dwTitle"></h3>
+    <button class="dw-x" onclick="closeDrawer()" aria-label="닫기">×</button>
+  </div>
+  <div class="dw-bd" id="dwBody"></div>
+</aside>
+
+<footer>
+  9100 PRO Global Signal Radar · SEED SNAPSHOT (수동 검증 2026-07-23) · Phase 1 프로토타입<br>
+  본 도구는 공개 웹 데이터 리서치 목적의 비공식 도구이며 삼성전자의 공식 서비스가 아닙니다. 모든 항목은 미검증 사용자 제보 또는 매체 관찰이며, 확인된 제품 결함·펌웨어 결함을 의미하지 않습니다. 게시글 수는 불량률이 아닙니다. PUBLIC_DATA_ONLY — 사내·고객 비공개 데이터를 입력하지 마십시오.
+</footer>
+
+<script>
+/* ══════════ SEED DATA — 2026-07-23 수동 검증한 실제 공개 게시글 기반 ══════════
+   q = 원문 그대로의 짧은 발췌(verbatim). 전체 워딩은 src 링크의 원문 페이지에서 확인. */
+const CATS = {
+  "A1":"BIOS 미인식","A4":"재부팅 후 소실","A5":"Gen5 링크 불안정",
+  "C1":"BSOD","C4":"시스템 프리징",
+  "E1":"순차 성능 미달","E4":"랜덤 쓰기 특성",
+  "G1":"펌웨어 연관 주장","G3":"Magician 진단 연관",
+  "H1":"보드 BIOS 요인","H4":"슬롯·레인 요인","H13":"Gen4 전환 시 안정",
+  "K":"대상 외·정상 확인"
+};
+const EVID = {u:"미검증 보고",m:"복수 출처 관찰",r:"재현 정보 포함",p:"플랫폼 원인 가능성",o:"공식 답변 존재",x:"해결·오분류",v:"매체 관찰"};
+
+const CASES = [
+/* ── CL-FW: 펌웨어 1B2QNXH7 업데이트 후 소실 (하이라이트) ── */
+ {id:"RC-101",fw1b:true,cluster:"CL-FW",cat:"G1",sev:4,evidence:"o",region:"미국(커뮤니티)",cap:"8TB",fw:"0B2QNXH7→1B2QNXH7",plat:"HP Z6 등",posts:6,date:"2026-07-21",title:"Magician으로 1B2QNXH7 업데이트 중 PC 자동 종료 후 드라이브 완전 미인식",
+  q:"the drive was gone—it didn't show up in the BIOS",qsite:"Samsung Community US",
+  claims:[{t:"사용자 주장 (요지)",crit:1,txt:"Magician에서 신규 펌웨어 알림을 받아 설치하자 PC가 자동 종료되었고, 재시작 후 BIOS·Windows 디스크 관리·Magician 어디에도 드라이브가 표시되지 않음. 이전 펌웨어는 0B2QNXH7."},{t:"모더레이터 답변",crit:0,txt:"펌웨어 실패의 명확한 징후가 없어 이례적이라며 기술지원 연락 안내. 원인 판단 없음."}],
+  hyps:[["—","펌웨어 업데이트 실패·brick 가능성 — 독립 확증 진행 중, 판단 유보"]],
+  counter:"스레드 내 동일 증상 추가 보고 이어짐. UNVERIFIED — 공식 확인으로 승격 금지.",
+  src:"https://us.community.samsung.com/t5/Monitors-and-Memory/Samsung-SSD-9100-Pro-New-Firmware-1B2QNXH7/m-p/3622061"},
+ {id:"RC-102",fw1b:true,cluster:"CL-FW",cat:"A1",sev:4,evidence:"u",region:"미국(커뮤니티)",cap:"2TB",fw:"1B2QNXH7",plat:"ASUS Rampage VI + Hyper M.2 카드",posts:4,date:"2026-07-21",title:"업데이트 전 정상, 이후 BIOS에서 소실 — 롤백 펌웨어 부재",
+  q:"Now my disk is gone from bios, nor can I boot",qsite:"Samsung Community US",
+  claims:[{t:"사용자 주장 (요지)",crit:1,txt:"펌웨어 업데이트 전까지 Hyper M.2 카드에서 문제없이 사용. 업데이트 후 BIOS에서 드라이브 소실, 부팅 불가. BIOS 기본값 로드·CMOS 클리어·Fast Boot 해제 모두 무효. 사이트에 롤백할 펌웨어가 없음."}],
+  hyps:[["—","펌웨어 업데이트 연관 — RC-101과 병합 검토"]],
+  counter:"독립 출처. 확장 카드 환경 공통점 여부 확인 필요.",
+  src:"https://us.community.samsung.com/t5/Monitors-and-Memory/Samsung-SSD-9100-Pro-vanished-after-Firmware-update-1B2QNXH7/m-p/3622607"},
+ {id:"RC-103",fw1b:true,cluster:"CL-FW",cat:"A5",sev:4,evidence:"r",region:"미국(커뮤니티)",cap:"4TB",fw:"1B2QNXH7",plat:"ASUS TUF X670E",posts:3,date:"2026-07-22",title:"업데이트 후 Gen5(Auto)에서 링크 트레이닝 실패 — 콜드부트+Gen4 강제로만 재인식",
+  q:"If left on 'Auto' (Gen 5), the link training completely fails",qsite:"Samsung Community US",
+  claims:[{t:"사용자 주장 (요지)",crit:1,txt:"업데이트 후 드라이브가 BIOS에서 사라짐. PSU를 분리해 완전 방전 후 콜드부트하고 BIOS에서 PCIe 링크를 Gen 4로 강제해야만 재인식됨. Auto(Gen5)로 두면 링크 트레이닝이 완전히 실패하고 보드가 포트를 차단."}],
+  hyps:[["—","펌웨어-Gen5 링크 트레이닝 상호작용 의심 — 핵심 재현 단서"]],
+  counter:"Gen4 전환 우회 재현 정보 포함 — 트리아지 우선순위 상향.",
+  src:"https://us.community.samsung.com/t5/Monitors-and-Memory/Samsung-SSD-9100-Pro-New-Firmware-1B2QNXH7/m-p/3622961"},
+ {id:"RC-104",fw1b:true,cluster:"CL-FW",cat:"A1",sev:3,evidence:"m",region:"글로벌(워크스테이션)",cap:"4TB",fw:"1B2QNXH7",plat:"Lenovo P720 (Gen3) · HP Z6 G4",posts:3,date:"2026-07-22",title:"Gen3 워크스테이션에서도 업데이트 후 미인식 — Gen5 전용 이슈 아님 시사",
+  q:"My SSD is also undetectable on HP Z6 G4.",qsite:"Samsung Community US",
+  claims:[{t:"사용자 주장 (요지)",crit:0,txt:"Lenovo ThinkStation P720(NVMe Gen3)과 HP Z6에서도 업데이트 후 드라이브 미인식 보고. Gen5 플랫폼에 국한되지 않을 가능성."}],
+  hyps:[["—","펌웨어 자체 요인 가중 (플랫폼 불문 발생 시)"]],
+  counter:"플랫폼 다양성 확대 — 클러스터 독립성 강화.",
+  src:"https://us.community.samsung.com/t5/Monitors-and-Memory/Samsung-SSD-9100-Pro-vanished-after-Firmware-update-1B2QNXH7/m-p/3623074"},
+ {id:"RC-105",fw1b:true,cluster:"CL-FW",cat:"A1",sev:3,evidence:"r",region:"유럽(커뮤니티 추정)",cap:"미상",fw:"1B2QNXH7",plat:"미상",posts:2,date:"2026-07-22",title:"Linux 라이브CD에서는 드라이브 인식 — BIOS·Windows에서만 미인식",
+  claims:[{t:"사용자 주장 (요지)",crit:0,txt:"Linux Mint 라이브CD로 부팅하면 Gen5 슬롯의 9100 PRO를 포함해 모든 드라이브가 보이고 파일 이동도 가능. BIOS와 Windows에서만 인식 문제 발생. (원문 워딩은 RC-103과 동일 페이지 — 링크에서 확인)"}],
+  hyps:[["—","드라이브 완전 사망이 아닌 초기화·열거 단계 이슈 시사 — 중요 진단 단서"]],
+  counter:"타 사례(완전 미인식)와 증상 편차 존재 — 하위 유형 분리 검토.",
+  src:"https://us.community.samsung.com/t5/Monitors-and-Memory/Samsung-SSD-9100-Pro-New-Firmware-1B2QNXH7/m-p/3622961"},
+
+/* ── CL-G5: AM5 ITX 보드 Gen5 미인식 (기존, FW 업데이트 무관) ── */
+ {id:"RC-110",cluster:"CL-G5",cat:"A1",sev:3,evidence:"o",region:"글로벌(ROG 포럼)",cap:"4TB",fw:"미상",plat:"ASUS B650E-I",posts:40,date:"2026-06-09",title:"Gen5 설정 시 대부분 미탐지, Gen4 전환 시 정상 — ASUS 공식 조사 진행",
+  q:"doesn't see the drive at all unless I switch back to Gen 4",qsite:"ASUS ROG Forum",
+  claims:[{t:"사용자 관찰 (요지)",crit:0,txt:"PCIe를 Gen5로 설정하면 드라이브가 대부분 탐지되지 않고, Gen4로 전환하면 정상 동작. Gen5에서 여러 번 재부팅하면 간혹 인식되는 비결정적 패턴."},{t:"공식 답변",crit:0,txt:"ASUS 모더레이터가 BIOS 설정 CMO 파일·CPU·SSD 펌웨어·재현 빈도 등 정보를 수집하며 B650E-I 외 B850-I 등으로 조사 범위 확대."}],
+  hyps:[["0.55","보드 BIOS Gen5 링크 트레이닝(H1)"],["0.30","슬롯·신호 품질(H4)"],["0.15","드라이브측 요인"]],
+  counter:"B850-I 베타 BIOS(1076)로 해결됐다는 보고 존재 — 보드 BIOS 원인 가중. Crucial T705·T700·MP700 유사 보고로 PLATFORM_WIDE_SUSPECT.",platWide:true,
+  src:"https://rog-forum.asus.com/t5/gaming-motherboards/asus-b650e-i-and-samsung-9100-pro-gen-5-issues/td-p/1094005"},
+ {id:"RC-111",cluster:"CL-G5",cat:"A1",sev:3,evidence:"u",region:"영국",cap:"2TB",fw:"0B2QNHX7",plat:"B650E-I + 9700X (부팅 드라이브)",posts:2,date:"2026-06-20",title:"Auto/Gen5에서 드물게만 인식 — ASUS 지원은 보드 반품 안내",
+  q:"the drive only rarely gets detected on boot",qsite:"ASUS ROG Forum",
+  claims:[{t:"사용자 관찰 (요지)",crit:0,txt:"M2_1 링크를 Auto 또는 GEN5로 두면 부팅 시 드라이브가 드물게만 탐지됨. 인식되면 Gen5 속도로 정상 동작. ASUS UK 지원은 보드 반품을 안내했으나 원인 불명."}],
+  hyps:[["0.55","보드 BIOS(H1)"],["0.45","개체·상호작용"]],
+  counter:"인식 시 정상 속도 — 드라이브 단독 결함 가능성 낮춤.",
+  src:"https://rog-forum.asus.com/t5/gaming-motherboards/asus-b650e-i-and-samsung-9100-pro-gen-5-issues/td-p/1094005/page/8"},
+ {id:"RC-112",cluster:"CL-G5",cat:"H1",sev:1,evidence:"x",region:"글로벌(ROG 포럼)",cap:"미상",fw:"미상",plat:"ROG STRIX B850-I",posts:2,date:"2026-06-25",title:"베타 BIOS 1076 적용 후 Gen5 정상 — 해결 보고",
+  claims:[{t:"해결 (요지)",crit:0,txt:"베타 BIOS 업데이트 후 M.2_1·M.2_2 모두 Gen5 전속으로 정상 동작. 이전에는 Gen5 불안정으로 Windows 설치까지 손상. (원문 워딩은 RC-111과 동일 페이지 — 링크에서 확인)"}],
+  hyps:[["0.90","보드 BIOS 원인(H1) — 해결로 확인 가중"],["0.10","기타"]],
+  counter:"보드 BIOS 원인 가설을 강하게 지지하는 반증적 해결 사례.",
+  src:"https://rog-forum.asus.com/t5/gaming-motherboards/asus-b650e-i-and-samsung-9100-pro-gen-5-issues/td-p/1094005/page/8"},
+ {id:"RC-113",cluster:"CL-G5",cat:"H4",sev:3,evidence:"p",region:"독일(추정)",cap:"미상",fw:"미상",plat:"B850-I · M.2_1 슬롯",posts:3,date:"2026-05-15",title:"M.2_1에서만 미인식, M.2_2에서는 정상 — 슬롯 종속성",
+  q:"9100 Pro not detected, T500 detected fine",qsite:"ASUS ROG Forum",
+  claims:[{t:"사용자 관찰 (요지)",crit:0,txt:"9100 PRO를 M.2_1에 두면 미탐지, M.2_2로 옮기면 정상 인식(반대로 Gen4 드라이브는 M.2_1에서 정상). BIOS 구·신버전 모두 동일."}],
+  hyps:[["0.65","슬롯·레인 경로(H4)"],["0.35","보드 BIOS(H1)"]],
+  counter:"슬롯 교차 재현 정보 — 플랫폼 요인 가중.",platWide:true,
+  src:"https://rog-forum.asus.com/t5/gaming-motherboards/asus-b650e-i-and-samsung-9100-pro-gen-5-issues/td-p/1094005/page/3"},
+
+/* ── CL-Z890: Z890·Arrow Lake 순차 성능 제한 ── */
+ {id:"RC-120",cluster:"CL-Z890",cat:"E1",sev:2,evidence:"m",region:"미국(인텔 커뮤니티)",cap:"미상",fw:"미상",plat:"MSI PRO Z890-A + Core Ultra 285K",posts:12,date:"2025-06-03",title:"CPU 직결 Gen5 M.2에서 공표 순차 속도 미달 — 보드 제조사 불문 공통",
+  q:"The common denominator is Z890 motherboard (regardless of make or model)",qsite:"Intel Community",
+  claims:[{t:"사용자 관찰 (요지)",crit:0,txt:"CPU에 직결된 PCIe 5.0 x4 M.2 슬롯 장착 시 공표 순차 읽기/쓰기 미달. 보드 제조사와 무관하게 Z890 + Arrow Lake 조합이 공통분모라는 복수 사용자 보고. MSI·삼성 모두 원인 불명."},{t:"인텔 답변",crit:0,txt:"인텔 커뮤니티 담당자는 보드의 레인 할당·라우팅 문제 가능성을 언급."}],
+  hyps:[["0.50","플랫폼 레인 관리(H2·H4)"],["0.35","보드 BIOS(H1)"],["0.15","기타"]],
+  counter:"x16 슬롯 어댑터 장착 시 정상 속도 보고 — 드라이브 자체 성능은 정상 시사.",platWide:true,
+  src:"https://community.intel.com/t5/Mobile-and-Desktop-Processors/Issue-with-Samsung-9100-Pro-speed-issues-on-Z890-Arrow-Lake/td-p/1681773"},
+ {id:"RC-121",cluster:"CL-Z890",cat:"A5",sev:3,evidence:"u",region:"글로벌(인텔 커뮤니티)",cap:"4TB",fw:"미상",plat:"ASUS ProArt Z890 + 285K",posts:2,date:"2025-06-05",title:"Gen5 x4 슬롯이 Gen1 속도로 동작 (<450MB/s)",
+  q:"the SSD is instead running at gen 1 speed",qsite:"Intel Community",
+  claims:[{t:"사용자 주장 (요지)",crit:0,txt:"Magician은 슬롯을 Gen5 x4로 표시하지만 실제 링크는 Gen1 속도로 동작(450MB/s 미만). 최신 BIOS·재장착·Gen5 강제 설정 모두 무효. 동일 시스템의 WD SN850X는 Gen4 정상."},{t:"커뮤니티 답변",crit:0,txt:"M2_1 슬롯 자체 결함 가능성 제기, ASUS 지원 문의 권고."}],
+  hyps:[["0.55","보드 슬롯·신호(H4)"],["0.45","링크 트레이닝 상호작용"]],
+  counter:"타 드라이브 정상 — 슬롯 종속 여부 교차 확인 필요.",
+  src:"https://community.intel.com/t5/Mobile-and-Desktop-Processors/Issue-with-Samsung-9100-Pro-speed-issues-on-Z890-Arrow-Lake/m-p/1694119"},
+ {id:"RC-122",cluster:"CL-Z890",cat:"E1",sev:2,evidence:"u",region:"글로벌(인텔 커뮤니티)",cap:"4TB",fw:"미상",plat:"MSI MEG Ace Z890 + 285K",posts:2,date:"2025-06-10",title:"CPU 직결 슬롯에서 14GB/s급 대비 12GB/s로 제한",
+  q:"I'm only seeing 12GB/sec",qsite:"Intel Community",
+  claims:[{t:"사용자 주장 (요지)",crit:0,txt:"GPU x16 + SSD x4로 CPU Gen5 레인을 직접 사용하는 구성에서 약 12GB/s로 제한. Arrow Lake 칩렛 구조 관련 스로틀링 기사와의 관련성 질의."}],
+  hyps:[["0.60","플랫폼 대역 특성(H2)"],["0.40","보드 BIOS(H1)"]],
+  counter:"RC-120과 동일 패턴 — 클러스터 병합.",
+  src:"https://community.intel.com/t5/Mobile-and-Desktop-Processors/Samsung-9100-Pro-4TB-being-throttled-Intel-285k-and-MSI-MEG-Ace/m-p/1694952"},
+ {id:"RC-123",cluster:"CL-Z890",cat:"E1",sev:2,evidence:"u",region:"글로벌(인텔 커뮤니티)",cap:"미상",fw:"미상",plat:"ASUS NUC15 Pro+ (Ultra 9 285H)",posts:3,date:"2025-06-01",title:"속도 측정치 큰 폭 변동 — 삼성 지원이 인텔 칩 이슈 언급했다는 주장",
+  q:"The unit is going from 14,000 reads",qsite:"Intel Community",
+  claims:[{t:"사용자 주장 (요지)",crit:0,txt:"정상 동작하다 읽기 14,000→2,883 수준까지 변동. 사용자에 따르면 삼성 기술지원이 Ultra 9 285H 칩 관련 이슈를 언급(전언 — 미확인)."}],
+  hyps:[["0.45","플랫폼·전원 관리"],["0.30","측정 조건"],["0.25","기타"]],
+  counter:"전언 기반 주장 — 공식 발언으로 취급 금지.",
+  src:"https://community.intel.com/t5/Mobile-and-Desktop-Processors/Issue-with-Samsung-9100-Pro-speed-issues-on-Z890-Arrow-Lake/m-p/1688973"},
+
+/* ── CL-STAB: BSOD·소실·fTPM ── */
+ {id:"RC-130",cluster:"CL-STAB",cat:"C1",sev:4,evidence:"r",region:"유럽(커뮤니티)",cap:"4TB",fw:"0B2QNXH7",plat:"ASUS X870E Hero (AM5) · fTPM",posts:5,date:"2026-06-14",title:"8개월 후 프리징→BSOD→BIOS 소실(콜드부트 복구), Magician 진단이 BSOD 재현 — fTPM 상호작용",
+  q:"The drive would only reappear after a full cold boot",qsite:"Samsung Community EU",
+  claims:[{t:"사용자 관찰 (요지)",crit:1,txt:"약 8개월 정상 사용 후 유휴 중에도 디스크 사용률 급증과 약 10초 프리징. 드물게 BSOD로 악화되며, Magician 전체 진단 검사가 90% 지점에서 BSOD를 확실히 재현. BSOD 후 BIOS에서 드라이브 소실, 완전 콜드부트로만 복구. SMART는 99% 건강·경고 0."},{t:"사용자 분석",crit:0,txt:"AMD fTPM 비활성화 시 증상이 유의미하게 완화되나 완전 해결은 아님. 보드 BIOS·SSD 펌웨어 모두 최신."}],
+  hyps:[["0.35","펌웨어-fTPM 상호작용"],["0.35","보드·플랫폼 요인(H1)"],["0.30","개체 요인"]],
+  counter:"재현 절차(진단 검사 90%)와 완화 조건(fTPM off) 포함 — 기술 트리아지 최우선 사례. CL-FW와의 연관성(동일 소실 패턴) 검토 필요.",
+  src:"https://eu.community.samsung.com/t5/computers-it/samsung-9100-pro-4tb-bsod-disk-disappears-from-bios-requires/td-p/14885475"},
+
+/* ── CL-RW: 랜덤 쓰기 특성 ── */
+ {id:"RC-140",cluster:"CL-RW",cat:"E4",sev:1,evidence:"v",region:"미국(매체)",cap:"4TB(리뷰)",fw:"출시 초기",plat:"리뷰 테스트베드",posts:1,date:"2025-03-20",title:"리뷰 매체가 4K 랜덤 쓰기 상대적 저속을 특성으로 지적",
+  q:"notably slow random 4K write speeds",qsite:"PCMag",
+  claims:[{t:"매체 관찰 (요지)",crit:0,txt:"PCMag 리뷰는 순차 처리량은 매우 빠르나 4K 랜덤 쓰기가 눈에 띄게 느리다고 평가. 결함이 아닌 성능 특성으로 분류."}],
+  hyps:[["0.80","제품 성능 특성 — 결함 아님"],["0.20","측정 조건"]],
+  counter:"공식 사양 범위 내 특성 논의 — 사용자 기대치 관리용 참고 신호.",
+  src:"https://tech.yahoo.com/computing/articles/samsung-9100-pro-ssd-review-120000806.html"},
+ {id:"RC-141",cluster:"CL-RW",cat:"K",sev:1,evidence:"x",region:"미국(포럼)",cap:"미상",fw:"미상",plat:"Mac Pro 7,1 + Sonnet PCIe3 어댑터",posts:2,date:"2025-04-07",title:"PCIe 3.0 어댑터 환경에서 9100 PRO 정상 결과 — 대조 참고",
+  q:"those results are great",qsite:"Tom's Hardware Forum",
+  claims:[{t:"대조 관찰 (요지)",crit:0,txt:"동일 Sonnet 어댑터에서 990 PRO는 랜덤 쓰기 저속을 보였으나 9100 PRO는 양호한 결과 — 9100 PRO 정상 동작의 대조 사례."}],
+  hyps:[["1.00","대상 외(타 제품 이슈의 대조군) — 종결"]],
+  counter:"9100 PRO 비이슈 확인 사례로 보존.",
+  src:"https://forums.tomshardware.com/threads/extremely-slow-random-writes-on-samsung-990-pro-nvme.3877286/"}
+];
+
+const CLUSTERS = [
+ {id:"CL-FW",name:"펌웨어 1B2QNXH7 업데이트 후 소실·Gen5 미인식",code:"G1 · A1 · A5",sev:4,fw:true,unv:true,trend:[0,0,0,0,0,0,0,0,0,0,0,1,2,3]},
+ {id:"CL-STAB",name:"BSOD 후 BIOS 소실 · 콜드부트 복구 (fTPM 연관)",code:"C1 · A4 · G3",sev:4,unv:true,trend:[0,0,1,0,1,0,1,1,0,1,1,1,1,1]},
+ {id:"CL-G5",name:"AM5 ITX 보드 Gen5 미인식 · Gen4 전환 시 안정",code:"A1 · H1 · H13",sev:3,plat:true,trend:[1,2,1,2,2,1,2,1,2,1,1,1,1,1]},
+ {id:"CL-Z890",name:"Z890·Arrow Lake 순차 성능 제한",code:"E1 · H2 · H4",sev:2,plat:true,trend:[2,1,2,2,1,2,1,1,1,1,0,1,1,0]},
+ {id:"CL-RW",name:"랜덤 쓰기 특성 논의 (매체·대조 포함)",code:"E4 · K",sev:1,trend:[1,0,1,0,0,1,0,0,1,0,0,0,0,0]}
+];
+
+let view="exec", sortKey="date", sortDir=-1, fwOnly=false;
+const $=id=>document.getElementById(id);
+
+function setView(v){
+  view=v;
+  $("viewExec").classList.toggle("hide",v!=="exec");
+  $("viewWb").classList.toggle("hide",v!=="wb");
+  $("tabExec").classList.toggle("on",v==="exec");
+  $("tabWb").classList.toggle("on",v==="wb");
+  window.scrollTo(0,0);
+}
+
+function sevChip(s){return `<span class="chip c-sev${s}">Sev ${s}</span>`}
+function evChip(e){return `<span class="chip c-ev">${EVID[e]}</span>`}
+function fwChip(){return `<span class="chip c-fw">FW 1B2QNXH7</span>`}
+
+function renderExec(){
+  $("clusterGrid").innerHTML = CLUSTERS.map(c=>{
+    const max=Math.max(...c.trend,1);
+    const n = CASES.filter(x=>x.cluster===c.id).length;
+    const p = CASES.filter(x=>x.cluster===c.id).reduce((a,x)=>a+x.posts,0);
+    return `<div class="cl ${c.fw?'fw':''}" onclick="gotoCluster('${c.id}')" role="button" tabindex="0" onkeydown="if(event.key==='Enter')gotoCluster('${c.id}')">
+      <div class="top"><div><h3>${c.name}</h3><div class="code">${c.id} · ${c.code}</div></div>${sevChip(c.sev)}</div>
+      <div class="meta">${c.fw?'<span class="chip c-fw">P0 후보 · 48h 급증</span>':''}${c.unv?'<span class="chip c-unv">UNVERIFIED</span>':''}${c.plat?'<span class="chip c-plat">PLATFORM_WIDE_SUSPECT</span>':''}</div>
+      <div class="bars" aria-label="14일 추이">${c.trend.map((v,i)=>`<i class="${i>=11?'hot':''}" style="height:${Math.max(6,v/max*100)}%"></i>`).join("")}</div>
+      <div class="stat"><span>고유 사례 ${n} · 관찰 게시글 ${p}+</span><span>최근 14일</span></div>
+    </div>`;
+  }).join("");
+
+  const regs={};
+  CASES.forEach(c=>regs[c.region]=(regs[c.region]||0)+1);
+  const arr=Object.entries(regs).sort((a,b)=>b[1]-a[1]);
+  const mx=arr[0][1];
+  $("regionRows").innerHTML=arr.map(([r,n])=>`<div class="rrow"><span class="nm">${r}</span><span class="bar"><i style="width:${n/mx*100}%"></i></span><span class="n">${n}</span></div>`).join("");
+}
+
+function gotoCluster(id){
+  setView("wb"); resetFilters(false); fwOnly=false; $("fwBtn").classList.remove("on");
+  $("fq").value=id; render();
+}
+function gotoFW(){
+  setView("wb"); resetFilters(false);
+  fwOnly=true; $("fwBtn").classList.add("on"); render();
+}
+function toggleFW(){ fwOnly=!fwOnly; $("fwBtn").classList.toggle("on",fwOnly); render(); }
+
+function fillOptions(){
+  const put=(id,vals)=>{const s=$(id);[...new Set(vals)].sort().forEach(v=>{const o=document.createElement("option");o.textContent=v;s.appendChild(o)})};
+  put("fcat",CASES.map(c=>c.cat+" "+CATS[c.cat]));
+  put("freg",CASES.map(c=>c.region));
+  put("fcap",CASES.map(c=>c.cap));
+}
+
+function filtered(){
+  const q=$("fq").value.trim().toLowerCase(),
+        cat=$("fcat").value.split(" ")[0], sev=$("fsev").value,
+        reg=$("freg").value, cap=$("fcap").value;
+  let rows=CASES.filter(c=>
+    (!fwOnly||c.fw1b)&&
+    (!cat||c.cat===cat)&&(!sev||String(c.sev)===sev)&&(!reg||c.region===reg)&&(!cap||c.cap===cap)&&
+    (!q||[c.id,c.cluster,c.title,c.plat,c.fw,CATS[c.cat],c.region].join(" ").toLowerCase().includes(q))
+  );
+  rows.sort((a,b)=>{
+    let A=a[sortKey],B=b[sortKey];
+    if(sortKey==="cat"){A=CATS[a.cat];B=CATS[b.cat]}
+    if(typeof A==="string")return A.localeCompare(B)*sortDir;
+    return (A-B)*sortDir;
+  });
+  return rows;
+}
+
+function setSort(k){ if(sortKey===k)sortDir*=-1; else{sortKey=k;sortDir=-1} render(); }
+function resetFilters(re=true){$("fq").value="";["fcat","fsev","freg","fcap"].forEach(i=>$(i).selectedIndex=0); fwOnly=false; $("fwBtn").classList.remove("on"); if(re)render();}
+
+function render(){
+  const rows=filtered();
+  $("fcount").textContent=`${rows.length} / ${CASES.length} 사례`;
+  $("tbody").innerHTML=rows.map(c=>`<tr class="${c.fw1b?'fwhl':''}" onclick="openDrawer('${c.id}')" tabindex="0" onkeydown="if(event.key==='Enter')openDrawer('${c.id}')">
+    <td class="tid">${c.id}<br>${c.cluster}</td>
+    <td class="ttl">${c.title}<div class="tsub">${c.plat}${c.fw1b?' · '+fwChip():''}${c.platWide?' · <span class="chip c-plat">PLATFORM?</span>':''}</div></td>
+    <td>${c.cat}<div class="tsub">${CATS[c.cat]}</div></td>
+    <td>${sevChip(c.sev)}</td>
+    <td>${evChip(c.evidence)}</td>
+    <td>${c.region}</td><td class="tid">${c.cap}</td><td class="tid">${c.fw}</td>
+    <td class="tid">${c.date.slice(2)}</td>
+    <td><a class="lnk" href="${c.src}" target="_blank" rel="noopener" title="원문 웹페이지 열기" aria-label="원문 웹페이지 열기" onclick="event.stopPropagation()">↗</a></td>
+  </tr>`).join("");
+  $("cardList").innerHTML=rows.map(c=>`<div class="ccase ${c.fw1b?'fwhl':''}" onclick="openDrawer('${c.id}')">
+    <div class="r1"><span>${c.id} · ${c.cluster}</span><span style="display:flex;gap:6px;align-items:center">${c.date.slice(2)}<a class="lnk" href="${c.src}" target="_blank" rel="noopener" aria-label="원문 웹페이지 열기" onclick="event.stopPropagation()">↗</a></span></div>
+    <h4>${c.title}</h4>
+    <div class="tsub">${c.cat} ${CATS[c.cat]} · ${c.region} · ${c.cap} · FW ${c.fw}</div>
+    <div class="r2">${sevChip(c.sev)}${evChip(c.evidence)}${c.fw1b?fwChip():''}${c.platWide?'<span class="chip c-plat">PLATFORM?</span>':''}</div>
+  </div>`).join("");
+}
+
+function openDrawer(id){
+  const c=CASES.find(x=>x.id===id); if(!c)return;
+  $("dwTitle").textContent=c.title;
+  $("dwBody").innerHTML=`
+    <div class="dw-sec">
+      <a class="openbtn ${c.fw1b?'fwred':''}" href="${c.src}" target="_blank" rel="noopener">원문 페이지에서 작성자 전체 워딩 보기 ↗</a>
+      <div style="display:flex;gap:5px;flex-wrap:wrap">
+        ${sevChip(c.sev)}${evChip(c.evidence)}
+        ${c.fw1b?fwChip():''}
+        ${c.platWide?'<span class="chip c-plat">PLATFORM_WIDE_SUSPECT</span>':''}
+        <span class="chip c-real">REAL SOURCE · 수동검증 07-23</span>
+      </div>
+    </div>
+    ${c.q?`<div class="dw-sec"><h5>원문 발췌 — 작성자 워딩 그대로</h5>
+      <div class="quote"><div class="qt">“${c.q}”</div><div class="qm">— ${c.qsite} 게시글에서 발췌. 전체 문장·맥락은 위 버튼으로 원문에서 확인하십시오.</div></div>
+    </div>`:''}
+    ${c.fw1b?'<div class="dw-sec"><div class="warnbox">펌웨어 1B2QNXH7 업데이트 연관 P0 후보 클러스터의 사례입니다. 미검증 사용자 제보이며, 독립 확증과 사람 검토·공식 확인 전에는 결함으로 표시하지 않습니다.</div></div>':''}
+    <div class="dw-sec"><h5>사례 정보</h5><div class="kv">
+      <span class="k">사례 ID</span><span class="v mono">${c.id} (${c.cluster})</span>
+      <span class="k">분류</span><span class="v">${c.cat} — ${CATS[c.cat]}</span>
+      <span class="k">지역(추정)</span><span class="v">${c.region}</span>
+      <span class="k">용량</span><span class="v">${c.cap}</span>
+      <span class="k">펌웨어</span><span class="v mono">${c.fw}</span>
+      <span class="k">시스템</span><span class="v">${c.plat}</span>
+      <span class="k">관찰 게시글</span><span class="v">${c.posts}건 이상 (수동 확인 최소치)</span>
+      <span class="k">최근 관찰</span><span class="v mono">${c.date}</span>
+      <span class="k">출처 사이트</span><span class="v">${c.qsite||new URL(c.src).hostname}</span>
+    </div></div>
+    <div class="dw-sec"><h5>Claims — 주장·관찰·답변 분리 (요지 재서술)</h5>
+      ${c.claims.map(cl=>`<div class="claim ${cl.crit?'crit':''}"><div class="ct">${cl.t}</div><p>${cl.txt}</p></div>`).join("")}
+    </div>
+    <div class="dw-sec"><h5>원인 가설 (확정 아님)</h5>
+      ${c.hyps.map(h=>`<div class="hyp"><span class="p">${h[0]}</span><span>${h[1]}</span></div>`).join("")}
+    </div>
+    <div class="dw-sec"><h5>반증·현황</h5><p style="font-size:12.5px">${c.counter}</p></div>
+    <div class="dw-sec"><h5>Evidence — 원문 URL</h5>
+      <a class="src" href="${c.src}" target="_blank" rel="noopener">${c.src}</a>
+      <p style="font-size:11px;color:var(--ink3);margin-top:6px">앱에는 짧은 발췌만 저장하며 전문은 원문 페이지에서 확인합니다(수집 원칙·저작권). 사용자명은 표시하지 않습니다. 게시글은 삭제·수정될 수 있습니다.</p>
+    </div>`;
+  $("drawer").classList.add("open");$("ovl").classList.add("open");
+}
+function closeDrawer(){$("drawer").classList.remove("open");$("ovl").classList.remove("open")}
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeDrawer()});
+
+function exportCSV(){
+  const rows=filtered();
+  const esc=v=>`"${String(v).replace(/"/g,'""')}"`;
+  const head=["case_id","cluster","fw_1b2qnxh7_related","title","category","category_name","severity","evidence_level","region_estimated","capacity","firmware","platform","observed_posts_min","last_seen","verbatim_excerpt","source_site","source_url","data_status"];
+  const csv=[head.join(",")].concat(rows.map(c=>[c.id,c.cluster,c.fw1b?"TRUE":"FALSE",c.title,c.cat,CATS[c.cat],c.sev,EVID[c.evidence],c.region,c.cap,c.fw,c.plat,c.posts,c.date,c.q||"",c.qsite||"",c.src,"REAL_SOURCE_MANUAL_SNAPSHOT_2026-07-23"].map(esc).join(","))).join("\r\n");
+  const blob=new Blob(["\uFEFF"+csv],{type:"text/csv;charset=utf-8"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="9100pro_signal_radar_seed_cases.csv";
+  a.click(); URL.revokeObjectURL(a.href);
+}
+
+fillOptions(); renderExec(); render();
+</script>
+</body>
+</html>
